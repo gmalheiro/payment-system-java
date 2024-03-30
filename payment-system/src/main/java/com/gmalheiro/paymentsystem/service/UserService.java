@@ -1,5 +1,6 @@
 package com.gmalheiro.paymentsystem.service;
 
+import com.gmalheiro.paymentsystem.dto.UserResponse;
 import com.gmalheiro.paymentsystem.entity.User;
 import com.gmalheiro.paymentsystem.repository.UserRepository;
 import com.gmalheiro.paymentsystem.util.RandomString;
@@ -16,7 +17,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerUser(User user){
+    public UserResponse registerUser(User user){
         if(userRepository.findByEmail(user.getEmail()) != null){
             throw  new RuntimeException("This email already exists");
         } else{
@@ -29,7 +30,13 @@ public class UserService {
 
             User savedUser = userRepository.save(user);
 
-            return  savedUser;
+            UserResponse userResponse = new UserResponse(
+                    savedUser.getId(),
+                    savedUser.getName(),
+                    savedUser.getEmail(),
+                    savedUser.getPassword());
+
+            return  userResponse;
         }
     }
 
