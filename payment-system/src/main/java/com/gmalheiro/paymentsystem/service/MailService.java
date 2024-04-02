@@ -7,12 +7,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
+
 @Service
 public class MailService {
 
-
     @Autowired
-    private  JavaMailSender emailSender;
+    private JavaMailSender emailSender;
 
     private String verifyURL = "http://localhost:8080/user/verify?code=";
 
@@ -411,5 +413,21 @@ public class MailService {
 
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            content = content.replace("[[NAME]]", user.getName());
+            content = content.replace("[[URL]]", verifyURL);
+            helper.setText(content, true);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String verifyURL = this.verifyURL + user.getVerificationCode();
+
+        emailSender.send(message);
+
     }
 }
