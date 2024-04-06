@@ -4,9 +4,12 @@ import com.gmalheiro.paymentsystem.dto.UserResponse;
 import com.gmalheiro.paymentsystem.entity.User;
 import com.gmalheiro.paymentsystem.repository.UserRepository;
 import com.gmalheiro.paymentsystem.util.RandomString;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
 
 @Service
 public class UserService {
@@ -17,7 +20,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserResponse registerUser(User user){
+    @Autowired
+    private  MailService mailService;
+
+    public UserResponse registerUser(User user) throws MessagingException, UnsupportedEncodingException {
         if(userRepository.findByEmail(user.getEmail()) != null){
             throw  new RuntimeException("This email already exists");
         } else{
@@ -35,7 +41,7 @@ public class UserService {
                     savedUser.getName(),
                     savedUser.getEmail(),
                     savedUser.getPassword());
-
+            mailService.sendVerificationEmail(user);
             return  userResponse;
         }
     }
