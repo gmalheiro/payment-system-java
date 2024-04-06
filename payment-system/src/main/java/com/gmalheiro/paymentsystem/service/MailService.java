@@ -418,14 +418,13 @@ public class MailService {
             helper.setFrom(fromAddress, senderName);
             helper.setTo(toAddress);
             helper.setSubject(subject);
+            String verifyURL = this.verifyURL + user.getVerificationCode();
             content = content.replace("[[NAME]]", user.getName());
             content = content.replace("[[URL]]", verifyURL);
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-        String verifyURL = this.verifyURL + user.getVerificationCode();
 
         emailSender.send(message);
 
